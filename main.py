@@ -2,6 +2,7 @@ import asyncio
 import argparse
 from datetime import datetime
 import logging
+import os
 import sys
 
 
@@ -57,10 +58,16 @@ async def _write_to_file(data, log_file):
 
 def process_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-H', '--host', help='Chat server address.')
-    parser.add_argument('-P', '--port', help='Chat server port.')
     parser.add_argument(
-        '-f', '--file', default='chat_history.txt',
+        '--host', default=os.getenv('CHAT_HOST', 'minechat.dvmn.org'),
+        help='Chat server address.'
+    )
+    parser.add_argument(
+        '--port', default=os.getenv('CHAT_PORT', 5000),
+        help='Chat server port.'
+    )
+    parser.add_argument(
+        '--history', default='chat.history',
         help='Chat history file path.'
     )
 
@@ -71,7 +78,7 @@ async def main():
     args = process_args()
 
     try:
-        async with AIOFile(args.file, 'a') as afp:
+        async with AIOFile(args.history, 'a') as afp:
             while True:
                 try:
                     reader = await _get_chat_connection(
