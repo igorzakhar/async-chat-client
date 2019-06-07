@@ -1,10 +1,14 @@
 import asyncio
 import argparse
 from datetime import datetime
+import logging
 import sys
 
 
 from aiofile import AIOFile
+
+
+logging.basicConfig(level=logging.DEBUG, format='%(message)s')
 
 
 def format_message(message):
@@ -19,12 +23,12 @@ async def _get_chat_connection(host, port, log_file, attempts=1, timeout=3):
         try:
             reader, _ = await asyncio.open_connection(host, port)
             success_message = 'Установлено соединение.'
-            print(format_message(success_message).strip())
+            logging.debug(format_message(success_message).rstrip())
             await log_file.write(format_message(success_message))
         except (ConnectionRefusedError, ConnectionResetError) as err:
             if attempts_count < attempts:
                 error_message = 'Нет соединения. Повторная попытка.'
-                print(format_message(error_message).strip())
+                logging.debug(format_message(error_message).rstrip())
                 await log_file.write(format_message(error_message))
                 attempts_count += 1
                 continue
@@ -33,7 +37,7 @@ async def _get_chat_connection(host, port, log_file, attempts=1, timeout=3):
                     f'Нет соединения. '
                     f'Повторная попытка через {timeout} сек.'
                 )
-                print(format_message(error_message).strip())
+                logging.debug(format_message(error_message).rstrip())
                 await log_file.write(format_message(error_message))
                 await asyncio.sleep(timeout)
     return reader
@@ -41,8 +45,8 @@ async def _get_chat_connection(host, port, log_file, attempts=1, timeout=3):
 
 async def _read_chat(reader):
     data = await reader.readline()
-    message = data.decode().strip()
-    print(format_message(message).strip())
+    message = data.decode().rstrip()
+    logging.debug(format_message(message).rstrip())
     return message
 
 
@@ -80,12 +84,12 @@ async def main():
                         await _write_to_file(data, afp)
                 except (ConnectionRefusedError, ConnectionResetError) as err:
                     error_message = 'Соединение потеряно.'
-                    print(format_message(error_message).strip())
+                    logging.debug(format_message(error_message).rstrip())
                     await afp.write(format_message(error_message))
                     continue
     except FileNotFoundError:
         error_value = sys.exc_info()[1]
-        print(f'{error_value.strerror}: {error_value.filename}')
+        logging.debug(f'{error_value.strerror}: {error_value.filename}')
         sys.exit(error_value.errno)
 
 
