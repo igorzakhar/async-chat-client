@@ -10,6 +10,7 @@ from aiofile import AIOFile
 
 
 logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+logging.getLogger('asyncio').setLevel(logging.WARNING)
 
 
 def format_message(message):
