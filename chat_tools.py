@@ -1,4 +1,5 @@
 import asyncio
+from contextlib import asynccontextmanager
 import logging
 from datetime import datetime
 
@@ -8,12 +9,13 @@ def format_message(message):
     return f'[{current_datetime}] {message}\n'
 
 
-async def get_chat_connection(host, port, log_file, attempts=1, timeout=3):
+async def _get_network_streams(host, port, log_file, attempts=1, timeout=3):
     attempts_count = 0
     reader = None
+    writer = None
     while not reader:
         try:
-            reader, _ = await asyncio.open_connection(host, port)
+            reader, writer = await asyncio.open_connection(host, port)
             success_message = 'Установлено соединение.'
             logging.debug(format_message(success_message).rstrip())
             await log_file.write(format_message(success_message))
@@ -32,7 +34,16 @@ async def get_chat_connection(host, port, log_file, attempts=1, timeout=3):
                 logging.debug(format_message(error_message).rstrip())
                 await log_file.write(format_message(error_message))
                 await asyncio.sleep(timeout)
-    return reader
+    return reader, writer
+
+
+@asynccontextmanager
+async def get_chat_connection(host, port, log_file):
+    reader, writer = await _get_network_streams(host, port, log_file)
+    try:
+        yield reader, writer
+    finally:
+        writer.close()
 
 
 async def read_chat_message(reader):

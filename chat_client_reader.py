@@ -35,6 +35,13 @@ def process_args():
     return parser.parse_args()
 
 
+async def read_messages_from_chat(host, port, log_file):
+    async with get_chat_connection(host, port, log_file) as (reader, writer):
+        while True:
+            message = await read_chat_message(reader)
+            await write_message_to_file(message, log_file)
+
+
 async def main():
     args = process_args()
 
@@ -42,14 +49,7 @@ async def main():
         async with AIOFile(args.history, 'a') as afp:
             while True:
                 try:
-                    reader = await get_chat_connection(
-                        args.host,
-                        args.port,
-                        afp
-                    )
-                    while True:
-                        data = await read_chat_message(reader)
-                        await write_message_to_file(data, afp)
+                    await read_messages_from_chat(args.host, args.port, afp)
                 except (ConnectionRefusedError, ConnectionResetError) as err:
                     error_message = 'Соединение потеряно.'
                     logging.debug(format_message(error_message).rstrip())
