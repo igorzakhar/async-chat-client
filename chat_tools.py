@@ -18,7 +18,7 @@ async def _get_network_streams(host, port, log_file, attempts=1, timeout=3):
             if attempts_count < attempts:
                 error_message = 'Нет соединения. Повторная попытка.'
                 logging.debug(error_message)
-                await log_file.write(error_message)
+                await write_message_to_file(error_message, log_file)
                 attempts_count += 1
                 continue
             else:
@@ -27,7 +27,7 @@ async def _get_network_streams(host, port, log_file, attempts=1, timeout=3):
                     f'Повторная попытка через {timeout} сек.'
                 )
                 logging.debug(error_message)
-                await log_file.write(error_message)
+                await write_message_to_file(error_message, log_file)
                 await asyncio.sleep(timeout)
     return reader, writer
 
