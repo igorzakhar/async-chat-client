@@ -6,7 +6,6 @@ import sys
 
 from aiofile import AIOFile
 from chat_tools import (
-    format_message,
     read_chat_message,
     get_chat_connection,
     write_message_to_file,
@@ -52,8 +51,8 @@ async def main():
                     await read_messages_from_chat(args.host, args.port, afp)
                 except (ConnectionRefusedError, ConnectionResetError) as err:
                     error_message = 'Соединение потеряно.'
-                    logging.debug(format_message(error_message).rstrip())
-                    await afp.write(format_message(error_message))
+                    logging.debug(error_message)
+                    await write_message_to_file(error_message, afp)
                     continue
     except FileNotFoundError:
         error_value = sys.exc_info()[1]
