@@ -28,6 +28,9 @@ def process_args():
         '--debug', action='store_true',
         help='Enable debug mode'
     )
+    parser.add_argument(
+        '--username', help='Username'
+    )
     return parser.parse_args()
 
 
@@ -61,9 +64,23 @@ async def authorise(reader, writer, token):
     return success
 
 
+async def register(reader, writer, username):
+    await read_message(reader)
+    await write_message(writer)
+    await read_message(reader)
+
+    if username:
+        await write_message(writer, f'{username}\n')
+    else:
+        await write_message(writer)
+    account_info = await read_message(reader)
+    return json.loads(account_info)
+
+
 async def main():
     args = process_args()
     token = args.token
+    username = args.username
 
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
@@ -75,19 +92,7 @@ async def main():
         if not authorised:
             return
     else:
-        data = await read_message(reader)
-        await write_message(writer)
-        data = await read_message(reader)
-        username = await aioconsole.ainput('>>> ')
-        if username:
-            await write_message(writer, f'{username}\n')
-            await read_message(reader)
-            await read_message(reader)
-
-        else:
-            await write_message(writer)
-            await read_message(reader)
-            await read_message(reader)
+        await register(reader, writer, username)
 
 
 if __name__ == '__main__':
