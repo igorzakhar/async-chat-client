@@ -5,11 +5,7 @@ import os
 import sys
 
 from aiofile import AIOFile
-from chat_tools import (
-    read_chat_message,
-    get_chat_connection,
-    write_message_to_file,
-)
+from chat_tools import get_chat_connection, write_message_to_file
 
 
 logging.basicConfig(level=logging.DEBUG, format='%(message)s')
@@ -32,6 +28,13 @@ def process_args():
     )
 
     return parser.parse_args()
+
+
+async def read_chat_message(reader):
+    data = await reader.readline()
+    message = data.decode().rstrip()
+    logging.debug(message)
+    return message
 
 
 async def read_messages_from_chat(host, port, log_file):

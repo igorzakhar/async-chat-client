@@ -41,13 +41,6 @@ async def get_chat_connection(host, port, log_file):
         writer.close()
 
 
-async def read_chat_message(reader):
-    data = await reader.readline()
-    message = data.decode().rstrip()
-    logging.debug(message)
-    return message
-
-
 async def write_message_to_file(message, log_file):
     current_datetime = datetime.now().strftime('%d.%m.%y %H:%M')
     line = f'[{current_datetime}] {message}\n'
