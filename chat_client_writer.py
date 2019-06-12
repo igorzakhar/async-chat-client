@@ -28,9 +28,8 @@ def process_args():
         '--debug', action='store_true',
         help='Enable debug mode'
     )
-    parser.add_argument(
-        '--username', help='Username'
-    )
+    parser.add_argument('--username', help='Username')
+    parser.add_argument('--message', help='Message')
     return parser.parse_args()
 
 
@@ -59,7 +58,6 @@ async def authorise(reader, writer, token):
             'Неизвестный токен. Поверьте его или зарегистрируйте заново.'
         )
     else:
-        data = await read_message(reader)
         success = True
     return success
 
@@ -77,10 +75,21 @@ async def register(reader, writer, username):
     return json.loads(account_info)
 
 
+async def submit_message(writer, message):
+    await write_message(writer, f'{message}\n\n')
+
+
+async def send_message_loop(writer):
+    while True:
+        message = await aioconsole.ainput('>>> ')
+        await submit_message(writer, message)
+
+
 async def main():
     args = process_args()
     token = args.token
     username = args.username
+    message = args.message
 
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
@@ -93,6 +102,11 @@ async def main():
             return
     else:
         await register(reader, writer, username)
+
+    if message:
+        await submit_message(writer, message)
+    else:
+        await send_message_loop(writer)
 
 
 if __name__ == '__main__':

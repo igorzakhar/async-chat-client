@@ -1,1 +1,2 @@
+aioconsole==0.1.14
 aiofile==1.5.2
