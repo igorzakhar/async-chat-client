@@ -3,9 +3,10 @@ import argparse
 import json
 import logging
 import os
+import sys
 
 import aioconsole
-
+from chat_tools import get_chat_connection
 
 log = logging.getLogger('sender')
 logging.getLogger('asyncio').setLevel(logging.WARNING)
@@ -28,6 +29,7 @@ def process_args():
         '--debug', action='store_true',
         help='Enable debug mode'
     )
+
     parser.add_argument('--username', help='Username')
     parser.add_argument('--message', help='Message')
     return parser.parse_args()
@@ -87,6 +89,8 @@ async def send_message_loop(writer):
 
 async def main():
     args = process_args()
+    host = args.host
+    port = args.port
     token = args.token
     username = args.username
     message = args.message
@@ -94,19 +98,22 @@ async def main():
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
 
-    reader, writer = await asyncio.open_connection(args.host, args.port)
-
-    if token:
-        authorised = await authorise(reader, writer, token)
-        if not authorised:
-            return
-    else:
-        await register(reader, writer, username)
-
-    if message:
-        await submit_message(writer, message)
-    else:
-        await send_message_loop(writer)
+    async with get_chat_connection(host, port) as (reader, writer):
+        try:
+            if token:
+                authorised = await authorise(reader, writer, token)
+                if not authorised:
+                    return
+            else:
+                await register(reader, writer, username)
+            if message:
+                await submit_message(writer, message)
+            else:
+                await send_message_loop(writer)
+        except (ConnectionRefusedError, ConnectionResetError):
+            error_value = sys.exc_info()[1]
+            log.debug(f'{error_value.strerror}')
+            sys.exit(error_value.errno)
 
 
 if __name__ == '__main__':
