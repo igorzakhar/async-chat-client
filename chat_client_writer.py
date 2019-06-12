@@ -46,6 +46,21 @@ async def write_message(writer, message=None):
     await writer.drain()
 
 
+async def authorise(reader, writer, token):
+    success = False
+    data = await read_message(reader)
+    await write_message(writer, f'{token}\n')
+    data = await read_message(reader)
+    if not json.loads(data):
+        print(
+            'Неизвестный токен. Поверьте его или зарегистрируйте заново.'
+        )
+    else:
+        data = await read_message(reader)
+        success = True
+    return success
+
+
 async def main():
     args = process_args()
     token = args.token
@@ -56,16 +71,9 @@ async def main():
     reader, writer = await asyncio.open_connection(args.host, args.port)
 
     if token:
-        data = await read_message(reader)
-        await write_message(writer, f'{token}\n')
-        data = await read_message(reader)
-        if not json.loads(data):
-            print(
-                'Неизвестный токен. Поверьте его или зарегистрируйте заново.'
-            )
-        else:
-            data = await read_message(reader)
-
+        authorised = await authorise(reader, writer, token)
+        if not authorised:
+            return
     else:
         data = await read_message(reader)
         await write_message(writer)
