@@ -45,3 +45,49 @@ usage: chat_client_reader.py [-h] [--host HOST] [--port PORT] [--history  HISTOR
 - ```--host HOST ``` -  Адрес чат-сервера (значение по умолчанию ```minechat.dvmn.org```)
 - ```--port PORT``` - TCP порт чат-сервера (значение по умолчанию ```5000```).
 - ```--history  HISTORY``` -  Путь к файлу в котором сохраняется история переписки в чате(по умолчанию текущая директория, файл ```chat.history```).
+
+## Запуск скрипта для отправки сообщений в чат (chat_client_reader.py).
+Скрипт включает в себя регистрацию нового пользователя и авторизацию существующего пользователя.
+##### 1. Пример запуска скрипта для регистрации нового пользователя:  
+```bash
+$ python3 chat_client_reader.py --username  YourUsername
+```
+Если имя не указано то генерируется чат-сервером и отправляется в ответном сообщении вместе с токеном. Отследить создание нового пользователя можно через режим отладки ```--debug```. Пример запуска:
+```bash
+$ python3 chat_client_reader.py --debug
+DEBUG:root:Установлено соединение.
+DEBUG:sender:Hello %username%! Enter your personal hash or leave it empty to create new account.
+DEBUG:sender:Sent message: '\n'
+DEBUG:sender:Enter preferred nickname below:
+DEBUG:sender:Sent message: '\n'
+DEBUG:sender:{"nickname": "New user", "account_hash": "..."}
+```
+##### 2. Пример запуска скрипта для аворизации и отправки сообщений:
+```bash
+$ python3 chat_client_reader.py --token xxx-xxxx.... --message YourMessage
+```
+Если не указан аргумент ```--message``` то запустится текстовый интерфейс c приглашением для ввода и отправки сообщений:
+```bash
+$ python3 chat_client_reader.py --token xxx-xxxx.... 
+>>> Hello world!
+>>> 
+```
+
+Аргументы командной строки:
+```
+usage: chat_client_writer.py [-h] [--host HOST] [--port PORT] [--token TOKEN]
+                             [--debug] [--username USERNAME]
+                             [--message MESSAGE]
+
+```
+- ```-h, --help``` - Вызов справки.
+- ```--host HOST ``` -  Адрес чат-сервера (значение по умолчанию ```minechat.dvmn.org```)
+- ```--port PORT``` - TCP порт чат-сервера (значение по умолчанию ```5050```).
+- ```--token TOKEN``` - Токен зарегистрированного пользователя (выдается при регистрации нового пользователя).
+- ```--username USERNAME``` - Имя пользователя (указывается при регистрации нового пользователя). Если не указано то генерируется чат-сервером.
+- ```--message MESSAGE``` - Собщение отправляемое в чат.
+- ```--debug``` - Включить режим отладки.
+
+# Цели проекта
+
+Код написан в учебных целях — это урок в курсе по Python и веб-разработке на сайте [Devman](https://dvmn.org).
