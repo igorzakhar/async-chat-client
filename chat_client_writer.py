@@ -23,7 +23,8 @@ def process_args():
         help='Chat server port.'
     )
     parser.add_argument(
-        '--token', default=os.getenv('CHAT_TOKEN', '')
+        '--token', default=os.getenv('CHAT_TOKEN', ''),
+        help='User token'
     )
     parser.add_argument(
         '--debug', action='store_true',
