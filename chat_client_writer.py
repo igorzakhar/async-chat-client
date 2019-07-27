@@ -111,10 +111,9 @@ async def main():
                 await submit_message(writer, message)
             else:
                 await send_message_loop(writer)
-        except (ConnectionRefusedError, ConnectionResetError):
-            error_value = sys.exc_info()[1]
-            log.debug(f'{error_value.strerror}')
-            sys.exit(error_value.errno)
+        except (ConnectionRefusedError, ConnectionResetError) as err:
+            log.exception(f'{err.strerror}', exc_info=False)
+            sys.exit(err.errno)
 
 
 if __name__ == '__main__':

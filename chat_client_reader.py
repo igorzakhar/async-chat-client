@@ -57,10 +57,9 @@ async def main():
                     logging.debug(error_message)
                     await write_message_to_file(error_message, afp)
                     continue
-    except FileNotFoundError:
-        error_value = sys.exc_info()[1]
-        logging.debug(f'{error_value.strerror}: {error_value.filename}')
-        sys.exit(error_value.errno)
+    except FileNotFoundError as err:
+        logging.exception(f'{err.strerror}: {err.filename}', exc_info=False)
+        sys.exit(err.errno)
 
 
 if __name__ == '__main__':
