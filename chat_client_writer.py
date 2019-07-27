@@ -51,18 +51,13 @@ async def write_message(writer, message=None):
     await writer.drain()
 
 
-async def authorise(reader, writer, token):
-    success = False
+async def is_authorized(reader, writer, token):
     data = await read_message(reader)
     await write_message(writer, f'{token}\n')
     data = await read_message(reader)
     if not json.loads(data):
-        print(
-            'Неизвестный токен. Поверьте его или зарегистрируйте заново.'
-        )
-    else:
-        success = True
-    return success
+        return False
+    return True
 
 
 async def register(reader, writer, username):
@@ -102,8 +97,12 @@ async def main():
     async with get_chat_connection(host, port) as (reader, writer):
         try:
             if token:
-                authorised = await authorise(reader, writer, token)
-                if not authorised:
+                authorized = await is_authorized(reader, writer, token)
+                if not authorized:
+                    print(
+                        'Неизвестный токен.'
+                        'Поверьте его или зарегистрируйте заново.'
+                    )
                     return
             else:
                 await register(reader, writer, username)
