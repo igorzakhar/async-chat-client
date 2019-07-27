@@ -15,7 +15,7 @@ async def _get_network_streams(host, port, log_file, attempts=1, timeout=3):
             logging.debug(success_message)
             if log_file:
                 await write_message_to_file(success_message, log_file)
-        except (ConnectionRefusedError, ConnectionResetError) as err:
+        except (ConnectionRefusedError, ConnectionResetError):
             if attempts_count < attempts:
                 error_message = 'Нет соединения. Повторная попытка.'
                 logging.debug(error_message)

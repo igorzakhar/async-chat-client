@@ -52,7 +52,7 @@ async def main():
             while True:
                 try:
                     await read_messages_from_chat(args.host, args.port, afp)
-                except (ConnectionRefusedError, ConnectionResetError) as err:
+                except (ConnectionRefusedError, ConnectionResetError):
                     error_message = 'Соединение потеряно.'
                     logging.debug(error_message)
                     await write_message_to_file(error_message, afp)
