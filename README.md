@@ -10,7 +10,7 @@
 
 Для запуска скриптов нужен предустановленный Python версии не ниже 3.7+.
 Также в программе используются следующие сторонние библиотеки:
-- aiofiles [https://github.com/Tinche/aiofiles](https://github.com/Tinche/aiofiles);
+- aiofile [https://github.com/mosquito/aiofile](https://github.com/mosquito/aiofile);
 - aioconsole [https://github.com/vxgmichel/aioconsole](https://github.com/vxgmichel/aioconsole).
 
 Рекомендуется устанавливать зависимости в виртуальном окружении, используя [virtualenv](https://github.com/pypa/virtualenv), [virtualenvwrapper](https://pypi.python.org/pypi/virtualenvwrapper) или [venv](https://docs.python.org/3/library/venv.html).
